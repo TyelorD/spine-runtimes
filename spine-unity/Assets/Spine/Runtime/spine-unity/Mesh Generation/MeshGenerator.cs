@@ -640,7 +640,7 @@ namespace Spine.Unity {
 				}
 
 				if (useClipping && clipper.IsClipping) {
-					clipper.ClipTriangles(workingVerts, attachmentVertexCount << 1, attachmentTriangleIndices, attachmentIndexCount, uvs);
+					clipper.ClipTriangles(workingVerts, attachmentTriangleIndices, attachmentIndexCount, uvs);
 					workingVerts = clipper.ClippedVertices.Items;
 					attachmentVertexCount = clipper.ClippedVertices.Count >> 1;
 					attachmentTriangleIndices = clipper.ClippedTriangles.Items;
@@ -1062,6 +1062,20 @@ namespace Spine.Unity {
 
 			meshBoundsMin *= scale;
 			meshBoundsMax *= scale;
+			meshBoundsThickness *= scale;
+		}
+
+		public void ScaleAndOffsetVertexData (float scale, Vector2 offset2D) {
+			Vector3 offset = new Vector3(offset2D.x, offset2D.y);
+			Vector3[] vbi = vertexBuffer.Items;
+			for (int i = 0, n = vertexBuffer.Count; i < n; i++) {
+				vbi[i] = vbi[i] * scale + offset;
+			}
+
+			meshBoundsMin *= scale;
+			meshBoundsMax *= scale;
+			meshBoundsMin += offset2D;
+			meshBoundsMax += offset2D;
 			meshBoundsThickness *= scale;
 		}
 
