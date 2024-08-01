@@ -212,7 +212,7 @@ export class SpinePlayer implements Disposable {
 
 	private playTime = 0;
 	private selectedBones: (Bone | null)[] = [];
-	private cancelId = 0;
+	private cancelId: any = 0;
 	popup: Popup | null = null;
 
 	/* True if the player is unable to load or render the skeleton. */
@@ -291,6 +291,7 @@ export class SpinePlayer implements Disposable {
 
 	private validateConfig (config: SpinePlayerConfig) {
 		if (!config) throw new Error("A configuration object must be passed to to new SpinePlayer().");
+		if ((config as any).skelUrl) config.skeleton = (config as any).skelUrl;
 		if (!config.skeleton && !config.jsonUrl && !config.binaryUrl) throw new Error("A URL must be specified for the skeleton JSON or binary file.");
 		if (!config.scale) config.scale = 1;
 		if (!config.atlas && !config.atlasUrl) throw new Error("A URL must be specified for the atlas file.");
@@ -816,8 +817,8 @@ export class SpinePlayer implements Disposable {
 			let delta = this.time.delta;
 
 			// Load the skeleton if the assets are ready.
-			let loading = this.assetManager!.isLoadingComplete();
-			if (!this.skeleton && loading) this.loadSkeleton();
+			let loading = !this.assetManager!.isLoadingComplete();
+			if (!this.skeleton && !loading) this.loadSkeleton();
 			let skeleton = this.skeleton!;
 			let config = this.config!;
 			if (skeleton) {
@@ -939,7 +940,7 @@ export class SpinePlayer implements Disposable {
 			// Draw the loading screen.
 			if (config.showLoading) {
 				this.loadingScreen!.backgroundColor.setFromColor(bg);
-				this.loadingScreen!.draw(loading);
+				this.loadingScreen!.draw(!loading);
 			}
 			if (loading && config.loading) config.loading(this, delta);
 		} catch (e) {
